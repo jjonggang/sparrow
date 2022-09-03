@@ -5,6 +5,7 @@ import com.sparrow.sparrow.config.oauth.dto.SessionUser;
 import com.sparrow.sparrow.domain.user.User;
 import com.sparrow.sparrow.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.Collections;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
@@ -25,7 +27,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        // DefaultOAuth2UserService 객체를 성공정보를 바탕으로 만든다.
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+        // 생성된 Service 객체로부터 User를 받는다.
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         // 로그인 진행중인 서비스를 구분하는 코드
@@ -35,7 +39,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 구글은 기본적으로 코드를 지원하지만, 네이버 카카오 등은 기본 지원하지 않는다. 구글의 기본 코드는 "sub"
         // 이후 구글 로그인과 네이버 로그인을 동시 지원할 때 사용한다.
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-
+        log.info("registrationId = {}", registrationId);
+        log.info("userNameAttributeName = {}", userNameAttributeName);
         // OAuth2UserService를 통해 가져온 OAuth2User의 attribute를 담을 클래스이다.
         // 이후 네이버 등 다른 소셜 로그인도 이 클래스를 사용한다 .
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());

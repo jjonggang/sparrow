@@ -30,7 +30,14 @@ public class OAuthAttributes {
     public static OAuthAttributes of(String registrationId,
                                      String userNameAttributeName,
                                      Map<String, Object> attributes){
-        return ofGoogle(userNameAttributeName, attributes);
+        switch (registrationId){
+            case "google":
+                return ofGoogle(userNameAttributeName, attributes);
+            case "kakao":
+                return ofKakao("email", attributes);
+            default:
+                throw new RuntimeException();
+        }
     }
 
     public static OAuthAttributes ofGoogle(String userNameAttributeName,
@@ -38,11 +45,24 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
-                .picture((String) attributes.get("picture"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();
     }
+
+    private static OAuthAttributes ofKakao(String attributeKey,
+                                           Map<String, Object> attributes) {
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
+
+        return OAuthAttributes.builder()
+                .name((String) kakaoProfile.get("nickname"))
+                .email((String) kakaoAccount.get("email"))
+                .attributes(kakaoAccount)
+                .nameAttributeKey(attributeKey)
+                .build();
+    }
+
 
     // User 엔티티를 생성한다.
     // OAuthAttributes에서 엔티티를 생성하는 시점은 처음 가입할 때.
