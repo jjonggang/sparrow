@@ -1,6 +1,7 @@
 package com.sparrow.sparrow.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sparrow.sparrow.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty("user_id")
@@ -22,6 +23,18 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder
+    public User(String name, String email, Role role){
+        this.name = name;
+        this.email = email;
+        this.role = role;
+    }
+
+    public User update(String name){
+        this.name = name;
+
+        return this;
+    }
     public String getRoleKey(){
         return this.role.getKey();
     }

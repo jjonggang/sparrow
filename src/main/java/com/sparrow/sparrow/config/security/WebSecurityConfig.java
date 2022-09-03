@@ -1,6 +1,8 @@
 package com.sparrow.sparrow.config.security;
 
+import com.sparrow.sparrow.config.oauth.CustomOAuth2UserService;
 import com.sparrow.sparrow.config.oauth.OAuth2AuthenticationSuccessHandler;
+import com.sparrow.sparrow.domain.user.Role;
 import com.sparrow.sparrow.service.oauth.UserOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,32 +27,32 @@ public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final UserOAuth2Service userOAuth2Service;
-
+    private final CustomOAuth2UserService customOAuth2UserService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // http 시큐리티 빌더
         http
-                .cors()
+                    .cors()
                 .and()// cors는 따로 설정했으므로 기본으로만 설정
-                .csrf()
-                .disable()
-                .httpBasic()// 토큰을 사용하기 때문에 basic 인증 disable
-                .disable()
-                .sessionManagement() // 세션 기반이 아님을 선언한다.
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .csrf()
+                    .disable()
+                    .httpBasic()// 토큰을 사용하기 때문에 basic 인증 disable
+                    .disable()
+                    .sessionManagement() // 세션 기반이 아님을 선언한다.
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers("/", "/api/v1/no-login/**", "/api/v1/auth/**"
-                        , "/api/v1/article/**"
-                        , "/api/v1/recommend-product/**").permitAll()
-                .anyRequest() // /와 /auth/** 이외의 모든 경로는 인증 해야됨
-                .authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/api/v1/**").hasRole(Role.USER.name())
+                    .antMatchers("/", "/api/v1/no-login/**", "/api/v1/auth/**").permitAll()
+                    .anyRequest() // /와 /auth/** 이외의 모든 경로는 인증 해야됨
+                        .authenticated()
                 .and()
-                .oauth2Login()
-                .defaultSuccessUrl("/login-success")
-                .successHandler(oAuth2AuthenticationSuccessHandler)
-                .userInfoEndpoint()
-                .userService(userOAuth2Service);
+                    .logout()
+                        .logoutSuccessUrl("/")
+                .and()
+                    .oauth2Login()
+                        .userInfoEndpoint()
+                            .userService(customOAuth2UserService);
         http.addFilterAfter(
                 jwtAuthenticationFilter, // jwtAuthenticationFilter를
                 CorsFilter.class // CorsFilter 클래스의 동작이 끝나면 실행하라.
