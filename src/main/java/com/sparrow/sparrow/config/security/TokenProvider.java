@@ -33,12 +33,12 @@ public class TokenProvider {
     @Value("${secret.key.refresh}")
     private String REFRESH_SECRET_KEY;
 
-    public String createRefreshToken(Long userId){
+    public String createRefreshToken(User user){
         Date expiryDate = Date.from(
                 Instant.now()
                         .plus(30, ChronoUnit.DAYS)
         );
-        User user = userRepository.findById(userId).get();
+//        User user = userRepository.findById(userId).get();
         String refreshToken = Jwts.builder()
                 // header에 들어갈 내용 및 서명을 하기 위한  SECRET_KEY
                 .signWith(SignatureAlgorithm.HS512, REFRESH_SECRET_KEY)
@@ -115,33 +115,28 @@ public class TokenProvider {
     public String validateRefreshToken(String refreshToken){
         // refresh 객체에서 refreshToken 추출
 //        String refreshToken = refreshTokenObj.getRefreshToken();
-        try {
-            // 검증
-            Claims claims = Jwts.parser()
-                    .setSigningKey(REFRESH_SECRET_KEY)
-                    .parseClaimsJws(refreshToken)
-                    .getBody();
-            String strUserId = claims.getSubject();
-            Long userId = Long.valueOf(strUserId);
-            Optional<User> user = userRepository.findById(userId);
+        // 검증
+        Claims claims = Jwts.parser()
+                .setSigningKey(REFRESH_SECRET_KEY)
+                .parseClaimsJws(refreshToken)
+                .getBody();
+        String strUserId = claims.getSubject();
+        Long userId = Long.valueOf(strUserId);
+        Optional<User> user = userRepository.findById(userId);
 
-            //refresh 토큰의 만료시간이 지나지 않았을 경우, 새로운 access 토큰을 생성합니다.
-            if(user.isPresent()){
-                // refresh token 비교
-                if(passwordEncoder.matches(refreshToken, user.get().getRefreshToken())){
-                    if (!claims.getExpiration().before(new Date())) {
-                        return create(user.get());
-                    }
-                }else{
-                    throw new RuntimeException("refresh token이 일치하지 않습니다. 새로 발급해주세요.");
+        //refresh 토큰의 만료시간이 지나지 않았을 경우, 새로운 access 토큰을 생성합니다.
+        if(user.isPresent()){
+            // refresh token 비교
+            if(passwordEncoder.matches(refreshToken, user.get().getRefreshToken())){
+                if (!claims.getExpiration().before(new Date())) {
+                    return create(user.get());
                 }
             }else{
-                throw new RuntimeException("존재하지 않는 유저입니다.");
+                throw new RuntimeException("refresh token이 일치하지 않습니다. 새로 발급해주세요.");
             }
-        }catch (Exception e) {
-            return null;
+        }else{
+            throw new RuntimeException("존재하지 않는 유저입니다.");
         }
-
         return null;
     }
 }

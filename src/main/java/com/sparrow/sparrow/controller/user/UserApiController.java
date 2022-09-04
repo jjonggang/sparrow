@@ -19,18 +19,18 @@ public class UserApiController {
     @Value("${secret.key.refresh.recreate}")
     private String SECRET_KEY;
     // refresh token을 생성한다.
-    @GetMapping("/user/create-refresh")
-    public ResponseEntity<?> createRefreshToken(@AuthenticationPrincipal String strUserId,
-                                   @RequestParam("refreshPassword")String refreshPassword){
-        Long userId = Long.parseLong(strUserId);
-        String refreshToken = null;
-        if(refreshPassword.equals(SECRET_KEY)){
-            refreshToken = tokenProvider.createRefreshToken(userId);
-        }else{
-            throw new RuntimeException("refreshPassword가 잘못됐습니다.");
-        }
-        return ResponseEntity.ok().body(refreshToken);
-    }
+//    @GetMapping("/user/create-refresh")
+//    public ResponseEntity<?> createRefreshToken(@AuthenticationPrincipal String strUserId,
+//                                   @RequestParam("refreshPassword")String refreshPassword){
+//        Long userId = Long.parseLong(strUserId);
+//        String refreshToken = null;
+//        if(refreshPassword.equals(SECRET_KEY)){
+//            refreshToken = tokenProvider.createRefreshToken(userId);
+//        }else{
+//            throw new RuntimeException("refreshPassword가 잘못됐습니다.");
+//        }
+//        return ResponseEntity.ok().body(refreshToken);
+//    }
 
     @GetMapping("/no-login/user/create-access")
     public ResponseEntity<?> createAccessToken(@RequestParam("refreshToken")String refreshToken,
@@ -41,4 +41,6 @@ public class UserApiController {
         }
         return ResponseEntity.ok().body(accessToken);
     }
+
+
 }

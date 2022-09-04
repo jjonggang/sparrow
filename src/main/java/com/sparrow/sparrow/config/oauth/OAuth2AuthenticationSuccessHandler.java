@@ -44,14 +44,16 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         Optional<User> user = userRepository.findByEmail(userDto.getEmail());
 
         String jwt = null;
+        String jwtRefresh = null;
         if(user.isPresent()){
             jwt = tokenProvider.create(user.get());
+            jwtRefresh = tokenProvider.createRefreshToken(user.get());
         }else{
             log.info("유저가 존재하지 않습니다.");
-            throw new RuntimeException("유저가 존재하지 않습니다.");
+            throw new RuntimeException("success handler에서의 user not exists 에러.");
         }
 
-        String url = makeRedirectUrl(jwt);
+        String url = makeRedirectUrl(jwt, jwtRefresh);
         System.out.println("url: " + url);
 
         if (response.isCommitted()) {
@@ -61,8 +63,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
-    private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect/"+token)
+    private String makeRedirectUrl(String token, String tokenRefresh) {
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect?access="+token+"&refresh="+tokenRefresh)
                 .build().toUriString();
     }
 }
