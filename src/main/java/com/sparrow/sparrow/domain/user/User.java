@@ -22,6 +22,8 @@ public class User extends BaseTimeEntity {
     private String birthday;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 
     @Builder
     public User(String name, String email, Role role){
@@ -39,4 +41,7 @@ public class User extends BaseTimeEntity {
         return this.role.getKey();
     }
 
+    public void setRefreshToken(String encodedToken) {
+        this.refreshToken = encodedToken;
+    }
 }

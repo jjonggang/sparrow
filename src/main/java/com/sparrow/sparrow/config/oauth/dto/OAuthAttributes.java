@@ -35,6 +35,8 @@ public class OAuthAttributes {
                 return ofGoogle(userNameAttributeName, attributes);
             case "kakao":
                 return ofKakao("email", attributes);
+            case "naver":
+                return ofNaver("id", attributes);
             default:
                 throw new RuntimeException();
         }
@@ -59,6 +61,18 @@ public class OAuthAttributes {
                 .name((String) kakaoProfile.get("nickname"))
                 .email((String) kakaoAccount.get("email"))
                 .attributes(kakaoAccount)
+                .nameAttributeKey(attributeKey)
+                .build();
+    }
+
+    private static OAuthAttributes ofNaver(String attributeKey,
+                                           Map<String, Object> attributes) {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+        return OAuthAttributes.builder()
+                .name((String) response.get("name"))
+                .email((String) response.get("email"))
+                .attributes(response)
                 .nameAttributeKey(attributeKey)
                 .build();
     }

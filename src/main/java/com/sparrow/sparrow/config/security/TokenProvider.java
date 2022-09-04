@@ -1,22 +1,59 @@
 package com.sparrow.sparrow.config.security;
 
 import com.sparrow.sparrow.domain.user.User;
+import com.sparrow.sparrow.domain.user.UserRepository;
+import com.sparrow.sparrow.dto.response.ResponseDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TokenProvider {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Value("${secret.key}")
     private String SECRET_KEY;
+
+    @Value("${secret.key.refresh}")
+    private String REFRESH_SECRET_KEY;
+
+    public String createRefreshToken(Long userId){
+        Date expiryDate = Date.from(
+                Instant.now()
+                        .plus(30, ChronoUnit.DAYS)
+        );
+        User user = userRepository.findById(userId).get();
+        String refreshToken = Jwts.builder()
+                // header에 들어갈 내용 및 서명을 하기 위한  SECRET_KEY
+                .signWith(SignatureAlgorithm.HS512, REFRESH_SECRET_KEY)
+                // payload에 들어갈 내용
+                .setSubject(user.getUserId().toString()) // sub
+                .setIssuer("sparrow")
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate) // exp
+                .compact();
+
+        String encodedToken = passwordEncoder.encode(refreshToken);
+        user.setRefreshToken(encodedToken);
+        userRepository.save(user);
+        return refreshToken;
+    }
 
     public String create(User user){
         // 기한은 1일로 설정
@@ -30,7 +67,7 @@ public class TokenProvider {
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 // payload에 들어갈 내용
                 .setSubject(user.getUserId().toString()) // sub
-                .setIssuer("demo app")
+                .setIssuer("sparrow")
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate) // exp
                 .compact();
@@ -60,7 +97,51 @@ public class TokenProvider {
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
                 .getBody();
+//        String strUserId = claims.getSubject();
+//        Long userId = Long.valueOf(strUserId);
+//        Optional<User> user = userRepository.findById(userId);
+//        if(user.isPresent()){
+//            if (!claims.getExpiration().before(new Date())) {
+//                return claims.getSubject();
+//            }
+//        }else{
+//            throw new RuntimeException("존재하지 않는 유저입니다.");
+//        }
+
 
         return claims.getSubject();
+    }
+
+    public String validateRefreshToken(String refreshToken){
+        // refresh 객체에서 refreshToken 추출
+//        String refreshToken = refreshTokenObj.getRefreshToken();
+        try {
+            // 검증
+            Claims claims = Jwts.parser()
+                    .setSigningKey(REFRESH_SECRET_KEY)
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+            String strUserId = claims.getSubject();
+            Long userId = Long.valueOf(strUserId);
+            Optional<User> user = userRepository.findById(userId);
+
+            //refresh 토큰의 만료시간이 지나지 않았을 경우, 새로운 access 토큰을 생성합니다.
+            if(user.isPresent()){
+                // refresh token 비교
+                if(passwordEncoder.matches(refreshToken, user.get().getRefreshToken())){
+                    if (!claims.getExpiration().before(new Date())) {
+                        return create(user.get());
+                    }
+                }else{
+                    throw new RuntimeException("refresh token이 일치하지 않습니다. 새로 발급해주세요.");
+                }
+            }else{
+                throw new RuntimeException("존재하지 않는 유저입니다.");
+            }
+        }catch (Exception e) {
+            return null;
+        }
+
+        return null;
     }
 }

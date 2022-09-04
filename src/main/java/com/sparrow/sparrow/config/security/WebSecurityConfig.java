@@ -3,7 +3,6 @@ package com.sparrow.sparrow.config.security;
 import com.sparrow.sparrow.config.oauth.CustomOAuth2UserService;
 import com.sparrow.sparrow.config.oauth.OAuth2AuthenticationSuccessHandler;
 import com.sparrow.sparrow.domain.user.Role;
-import com.sparrow.sparrow.service.oauth.UserOAuth2Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -26,7 +25,6 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    private final UserOAuth2Service userOAuth2Service;
     private final CustomOAuth2UserService customOAuth2UserService;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -42,7 +40,7 @@ public class WebSecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests()
-                    .antMatchers("/api/v1/**").hasRole(Role.USER.name())
+//                    .antMatchers("/api/v1/**").authenticated()
                     .antMatchers("/", "/api/v1/no-login/**", "/api/v1/auth/**").permitAll()
                     .anyRequest() // /와 /auth/** 이외의 모든 경로는 인증 해야됨
                         .authenticated()
