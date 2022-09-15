@@ -22,9 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1")
 public class MusicApiController {
-
     private final MusicService musicService;
-
     @GetMapping("/music")
     public ResponseEntity<?> getTags(){
         try{

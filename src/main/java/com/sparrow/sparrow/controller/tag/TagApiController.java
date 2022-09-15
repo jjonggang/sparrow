@@ -25,9 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1")
 public class TagApiController {
-
     private final TagService tagService;
-
     @GetMapping("/tag")
     public ResponseEntity<?> getTags(){
         try{

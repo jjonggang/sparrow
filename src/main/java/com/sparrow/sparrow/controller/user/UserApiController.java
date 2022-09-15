@@ -2,6 +2,8 @@ package com.sparrow.sparrow.controller.user;
 
 
 import com.sparrow.sparrow.config.security.TokenProvider;
+import com.sparrow.sparrow.domain.user.User;
+import com.sparrow.sparrow.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1")
 public class UserApiController {
-
+    private final UserService userService;
     private final TokenProvider tokenProvider;
     @Value("${secret.key.refresh.recreate}")
     private String SECRET_KEY;
@@ -40,6 +42,13 @@ public class UserApiController {
             accessToken = tokenProvider.validateRefreshToken(refreshToken);
         }
         return ResponseEntity.ok().body(accessToken);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal String strUserId){
+        Long userId = Long.parseLong(strUserId);
+        User user = userService.getUser(userId);
+        return ResponseEntity.ok().body(userId);
     }
 
 
