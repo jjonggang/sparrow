@@ -14,6 +14,5 @@ import java.util.List;
 public class ResponsePageDto<T> {
     private String error;
     private Long pageCount;
-    private Long commentNum;
     private List<T> data;
 }

@@ -59,7 +59,7 @@ public class TokenProvider {
         // 기한은 1일로 설정
         Date expiryDate = Date.from(
                 Instant.now()
-                        .plus(30, ChronoUnit.DAYS)
+                        .plus(1, ChronoUnit.DAYS)
         );
 
         return Jwts.builder()

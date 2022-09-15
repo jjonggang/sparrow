@@ -25,6 +25,7 @@ public class User extends BaseTimeEntity {
     @JsonProperty("refresh_token")
     private String refreshToken;
 
+    private String level;
     @Builder
     public User(String name, String email, Role role){
         this.name = name;
