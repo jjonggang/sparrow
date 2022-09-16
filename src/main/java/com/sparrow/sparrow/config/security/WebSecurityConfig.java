@@ -44,9 +44,9 @@ public class WebSecurityConfig {
                     .antMatchers("/", "/api/v1/no-login/**", "/api/v1/auth/**").permitAll()
                     .anyRequest() // /와 /auth/** 이외의 모든 경로는 인증 해야됨
                         .authenticated()
-                .and()
-                    .logout()
-                        .logoutSuccessUrl("/")
+//                .and()
+//                    .logout()
+//                        .logoutSuccessUrl("/")
                 .and()
                     .oauth2Login()
                     .successHandler(oAuth2AuthenticationSuccessHandler)
