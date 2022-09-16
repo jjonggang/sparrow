@@ -90,10 +90,10 @@ public class MeditationRecordApiController {
     }
     @DeleteMapping("/meditation-record")
     public ResponseEntity<?> deleteMeditationRecord(@AuthenticationPrincipal String strUserId,
-                                                    @RequestBody MeditationRecordRequestDto requestDto){
+                                                    @RequestParam Long recordId){
         try{
             Long userId = Long.parseLong(strUserId);
-            meditationRecordService.delete(userId, requestDto.getMeditationRecordId());
+            meditationRecordService.delete(userId, recordId);
             return ResponseEntity.ok().body("삭제 완료");
         }catch (Exception e){
             // 사용자 정보는 항상 하나이므로 리스트로 만들어야하는 ResponseDto를 사용하지 않고 그냥 UserDto리턴

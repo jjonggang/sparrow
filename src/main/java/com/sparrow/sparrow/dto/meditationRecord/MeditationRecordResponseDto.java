@@ -40,8 +40,7 @@ public class MeditationRecordResponseDto {
         this.rainSound = entity.getRainSound();
         this.fireSound = entity.getFireSound();
         this.duration = entity.getDuration();
-        this.tagIds = entity.getMeditationRecordTags().stream()
-                .map(MeditationRecordTag::getMeditationRecordTagId).collect(Collectors.toList());
+        this.tagIds = entity.getMeditationRecordTags().stream().map(tag -> tag.getTag().getTagId()).collect(Collectors.toList());
         this.createdDate = entity.getCreatedDate().toString();
     }
 }
