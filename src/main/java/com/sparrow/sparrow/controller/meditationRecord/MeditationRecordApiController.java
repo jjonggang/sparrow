@@ -3,9 +3,11 @@ package com.sparrow.sparrow.controller.meditationRecord;
 import com.sparrow.sparrow.domain.meditationRecord.MeditationRecord;
 import com.sparrow.sparrow.dto.meditationRecord.MeditationRecordRequestDto;
 import com.sparrow.sparrow.dto.meditationRecord.MeditationRecordResponseDto;
+import com.sparrow.sparrow.dto.meditationRecord.MeditationRecordUpdateRequestDto;
 import com.sparrow.sparrow.dto.response.ResponseDto;
 import com.sparrow.sparrow.dto.response.ResponsePageDto;
 import com.sparrow.sparrow.service.meditationRecord.MeditationRecordService;
+import com.sparrow.sparrow.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class MeditationRecordApiController {
 
     private final MeditationRecordService meditationRecordService;
+    private final UserService userService;
 
     @GetMapping("/meditation-record")
     public ResponseEntity<?> getRecord(@AuthenticationPrincipal String strUserId,
@@ -56,6 +59,7 @@ public class MeditationRecordApiController {
         try{
             Long userId = Long.parseLong(strUserId);
             MeditationRecord record = meditationRecordService.create(userId, requestDto);
+            userService.updateMeditationTime(userId, record.getDuration());
             return ResponseEntity.ok().body(new MeditationRecordResponseDto(record));
         }catch (Exception e){
             // 사용자 정보는 항상 하나이므로 리스트로 만들어야하는 ResponseDto를 사용하지 않고 그냥 UserDto리턴
@@ -69,7 +73,7 @@ public class MeditationRecordApiController {
     }
     @PutMapping("/meditation-record")
     public ResponseEntity<?> putMeditationRecord(@AuthenticationPrincipal String strUserId,
-                                                 @RequestBody MeditationRecordRequestDto requestDto){
+                                                 @RequestBody MeditationRecordUpdateRequestDto requestDto){
         try{
             Long userId = Long.parseLong(strUserId);
             MeditationRecord record = meditationRecordService.update(userId, requestDto);

@@ -17,6 +17,9 @@ public class User extends BaseTimeEntity {
     @JsonProperty("user_id")
     private Long userId;
     private String name;
+    private Integer duration;
+    @JsonProperty("profile_image")
+    private String profileImage;
     private String email;
     private String gender;
     private String birthday;
@@ -44,5 +47,9 @@ public class User extends BaseTimeEntity {
 
     public void setRefreshToken(String encodedToken) {
         this.refreshToken = encodedToken;
+    }
+
+    public void updateMeditationTime(Integer duration) {
+        this.duration += duration;
     }
 }

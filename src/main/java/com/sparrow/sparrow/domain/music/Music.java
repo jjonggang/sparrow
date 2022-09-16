@@ -27,7 +27,7 @@ public class Music {
     private String musicPath;
     @JsonProperty("music_image_path")
     private String musicImagePath;
-    @JsonProperty("music_duration_sec")
-    private String musicDurationSec;
+    @JsonProperty("music_duration")
+    private String musicDuration;
     private String composer;
 }

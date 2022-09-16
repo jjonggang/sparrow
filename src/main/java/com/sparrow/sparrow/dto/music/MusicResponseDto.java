@@ -15,14 +15,14 @@ public class MusicResponseDto {
     private String musicName;
     private String musicPath;
     private String musicImagePath;
-    private String musicDurationSec;
+    private String musicDuration;
     private String composer;
     public MusicResponseDto(Music entity){
         this.musicId = entity.getMusicId();
         this.musicName = entity.getMusicName();
         this.musicPath = entity.getMusicPath();
         this.musicImagePath = entity.getMusicImagePath();
-        this.musicDurationSec = entity.getMusicDurationSec();
+        this.musicDuration = entity.getMusicDuration();
         this.composer = entity.getComposer();
     }
 }

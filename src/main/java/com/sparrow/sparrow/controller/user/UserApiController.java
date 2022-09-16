@@ -3,6 +3,7 @@ package com.sparrow.sparrow.controller.user;
 
 import com.sparrow.sparrow.config.security.TokenProvider;
 import com.sparrow.sparrow.domain.user.User;
+import com.sparrow.sparrow.dto.user.UserBasicResponseDto;
 import com.sparrow.sparrow.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +21,6 @@ public class UserApiController {
     private final TokenProvider tokenProvider;
     @Value("${secret.key.refresh.recreate}")
     private String SECRET_KEY;
-    // refresh token을 생성한다.
-//    @GetMapping("/user/create-refresh")
-//    public ResponseEntity<?> createRefreshToken(@AuthenticationPrincipal String strUserId,
-//                                   @RequestParam("refreshPassword")String refreshPassword){
-//        Long userId = Long.parseLong(strUserId);
-//        String refreshToken = null;
-//        if(refreshPassword.equals(SECRET_KEY)){
-//            refreshToken = tokenProvider.createRefreshToken(userId);
-//        }else{
-//            throw new RuntimeException("refreshPassword가 잘못됐습니다.");
-//        }
-//        return ResponseEntity.ok().body(refreshToken);
-//    }
 
     @GetMapping("/no-login/user/create-access")
     public ResponseEntity<?> createAccessToken(@RequestParam("refreshToken")String refreshToken,
@@ -48,7 +36,13 @@ public class UserApiController {
     public ResponseEntity<?> getUser(@AuthenticationPrincipal String strUserId){
         Long userId = Long.parseLong(strUserId);
         User user = userService.getUser(userId);
-        return ResponseEntity.ok().body(userId);
+        return ResponseEntity.ok().body(new UserBasicResponseDto(user));
+    }
+
+    @GetMapping("/user/others")
+    public ResponseEntity<?> getUserNoLogin(@RequestParam Long userId){
+        User user = userService.getUser(userId);
+        return ResponseEntity.ok().body(new UserBasicResponseDto(user));
     }
 
 

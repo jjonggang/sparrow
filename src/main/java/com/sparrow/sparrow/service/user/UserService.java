@@ -14,4 +14,10 @@ public class UserService {
     public User getUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
     }
+
+    public User updateMeditationTime(Long userId, Integer duration) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("해당 유저가 없습니다."));
+        user.updateMeditationTime(duration);
+        return userRepository.save(user);
+    }
 }

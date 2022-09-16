@@ -49,7 +49,6 @@ public class WebSecurityConfig {
                         .logoutSuccessUrl("/")
                 .and()
                     .oauth2Login()
-                    .defaultSuccessUrl("/login-success")
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                         .userInfoEndpoint()
                             .userService(customOAuth2UserService);

@@ -9,6 +9,7 @@ import com.sparrow.sparrow.domain.tag.TagRepository;
 import com.sparrow.sparrow.domain.user.User;
 import com.sparrow.sparrow.domain.user.UserRepository;
 import com.sparrow.sparrow.dto.meditationRecord.MeditationRecordRequestDto;
+import com.sparrow.sparrow.dto.meditationRecord.MeditationRecordUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +43,7 @@ public class MeditationRecordService {
                 .oceanSound(requestDto.getOceanSound())
                 .rainSound(requestDto.getRainSound())
                 .fireSound(requestDto.getFireSound())
-                .durationSec(requestDto.getDurationSec())
+                .duration(requestDto.getDuration())
                 .build();
         MeditationRecord savedRecord = meditationRecordRepository.save(record);
         if (requestDto.getTagIds() != null) {
@@ -59,10 +60,7 @@ public class MeditationRecordService {
         return meditationRecordRepository.save(record);
     }
 
-    public MeditationRecord update(Long userId, MeditationRecordRequestDto requestDto){
-        Music music = musicRepository.findById(requestDto.getMusicId()).orElseThrow(
-                () -> new IllegalArgumentException("해당 노래가 없습니다. id=" + requestDto.getMusicId())
-        );
+    public MeditationRecord update(Long userId, MeditationRecordUpdateRequestDto requestDto){
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalArgumentException("해당 유저가 없습니다. id=" + userId)
         );
@@ -71,7 +69,7 @@ public class MeditationRecordService {
                 () -> new IllegalArgumentException("해당 기록이 없습니다. id=" + requestDto.getMeditationRecordId())
         );
 
-        dbRecord.update(requestDto, music, user);
+        dbRecord.update(requestDto, user);
 
         if (requestDto.getTagIds() != null) {
             List<MeditationRecordTag> tags = requestDto.getTagIds().stream().map(tagId -> {
