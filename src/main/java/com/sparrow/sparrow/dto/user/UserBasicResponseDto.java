@@ -15,7 +15,11 @@ public class UserBasicResponseDto {
     private String name;
     private Integer duration;
     public UserBasicResponseDto(User entity) {
-        this.profileImage = entity.getProfileImage();
+        if(entity.getProfileImage() == null){
+            this.profileImage = "https://nutrition-helper-bucket.s3.ap-northeast-2.amazonaws.com/profile/cat_profile.jpg";
+        }else{
+            this.profileImage = entity.getProfileImage();
+        }
         this.name = entity.getName();
         this.duration = entity.getDuration();
     }
