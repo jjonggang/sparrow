@@ -13,6 +13,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // origin이 http://localhost:3000에 대해
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000",
+                        "https://hibklhpldnfjhjbhdendooahknhcajgo.chromiumapp.org",
                         "https://uplus.ssoyo.me",
                         "https://www.ssoyo.me",
                         "https://ssoyo.me")

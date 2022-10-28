@@ -64,7 +64,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     }
 
     private String makeRedirectUrl(String token, String tokenRefresh) {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect?access="+token+"&refresh="+tokenRefresh)
+//        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth2/redirect?access="+token+"&refresh="+tokenRefresh)
+//                .build().toUriString();
+        return UriComponentsBuilder.fromUriString("https://hibklhpldnfjhjbhdendooahknhcajgo.chromiumapp.org/oauth2?access="+token+"&refresh="+tokenRefresh)
                 .build().toUriString();
     }
 }
